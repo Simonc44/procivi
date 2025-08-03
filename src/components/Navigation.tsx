@@ -2,12 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Menu, X, Sparkles, Crown } from "lucide-react";
 import { useState } from "react";
-
 export const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-border/50">
+  return <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-border/50">
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -26,9 +23,7 @@ export const Navigation = () => {
             <a href="#features" className="text-foreground hover:text-primary transition-colors font-medium">
               Fonctionnalités
             </a>
-            <a href="#templates" className="text-foreground hover:text-primary transition-colors font-medium">
-              Templates
-            </a>
+            
             <a href="#pricing" className="text-foreground hover:text-primary transition-colors font-medium">
               Tarifs
             </a>
@@ -55,46 +50,24 @@ export const Navigation = () => {
           </div>
 
           {/* Mobile menu button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
+          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </Button>
         </div>
 
         {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border/50">
+        {isMenuOpen && <div className="md:hidden py-4 border-t border-border/50">
             <div className="flex flex-col gap-4">
-              <a 
-                href="#features" 
-                className="text-foreground hover:text-primary transition-colors font-medium py-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
+              <a href="#features" className="text-foreground hover:text-primary transition-colors font-medium py-2" onClick={() => setIsMenuOpen(false)}>
                 Fonctionnalités
               </a>
-              <a 
-                href="#templates" 
-                className="text-foreground hover:text-primary transition-colors font-medium py-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
+              <a href="#templates" className="text-foreground hover:text-primary transition-colors font-medium py-2" onClick={() => setIsMenuOpen(false)}>
                 Templates
               </a>
-              <a 
-                href="#pricing" 
-                className="text-foreground hover:text-primary transition-colors font-medium py-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
+              <a href="#pricing" className="text-foreground hover:text-primary transition-colors font-medium py-2" onClick={() => setIsMenuOpen(false)}>
                 Tarifs
               </a>
-              <a 
-                href="/about" 
-                className="text-foreground hover:text-primary transition-colors font-medium py-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
+              <a href="/about" className="text-foreground hover:text-primary transition-colors font-medium py-2" onClick={() => setIsMenuOpen(false)}>
                 À propos
               </a>
               <div className="flex flex-col gap-3 pt-4 border-t border-border/50">
@@ -109,9 +82,7 @@ export const Navigation = () => {
                 </Button>
               </div>
             </div>
-          </div>
-        )}
+          </div>}
       </div>
-    </nav>
-  );
+    </nav>;
 };
