@@ -40,22 +40,10 @@ const About = () => {
 
   const team = [
     {
-      name: "Marie Dubois",
-      role: "CEO & Co-fondatrice",
-      description: "Ex-RH chez Google, passionnée par l'impact de l'IA sur le recrutement moderne.",
-      avatar: "MD"
-    },
-    {
-      name: "Thomas Martin",
-      role: "CTO & Co-fondateur", 
-      description: "Expert en IA et développement, ancien ingénieur chez OpenAI et DeepMind.",
-      avatar: "TM"
-    },
-    {
-      name: "Sophie Laurent",
-      role: "Head of Product",
-      description: "Designer UX/UI experte, ancienne Lead Designer chez Figma et Notion.",
-      avatar: "SL"
+      name: "Simon Cusseaau",
+      role: "Fondateur & Développeur",
+      description: "Passionné par l'IA et l'innovation, créateur de solutions intelligentes pour optimiser la recherche d'emploi.",
+      avatar: "SC"
     }
   ];
 
