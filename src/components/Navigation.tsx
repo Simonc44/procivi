@@ -32,19 +32,21 @@ export const Navigation = () => {
             <a href="#pricing" className="text-foreground hover:text-primary transition-colors font-medium">
               Tarifs
             </a>
-            <a href="#about" className="text-foreground hover:text-primary transition-colors font-medium">
+            <a href="/about" className="text-foreground hover:text-primary transition-colors font-medium">
               À propos
             </a>
           </div>
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="ghost" size="sm">
-              Connexion
+            <Button variant="ghost" size="sm" asChild>
+              <a href="/login">Connexion</a>
             </Button>
-            <Button variant="default" size="sm" className="group">
-              Essayer gratuitement
-              <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+            <Button variant="default" size="sm" className="group" asChild>
+              <a href="/cv-generator">
+                Créer mon CV
+                <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+              </a>
             </Button>
             <Badge variant="outline" className="bg-gradient-ai text-white border-ai-purple/30">
               <Crown className="w-3 h-3 mr-1" />
@@ -89,19 +91,21 @@ export const Navigation = () => {
                 Tarifs
               </a>
               <a 
-                href="#about" 
+                href="/about" 
                 className="text-foreground hover:text-primary transition-colors font-medium py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 À propos
               </a>
               <div className="flex flex-col gap-3 pt-4 border-t border-border/50">
-                <Button variant="ghost" size="sm">
-                  Connexion
+                <Button variant="ghost" size="sm" asChild>
+                  <a href="/login">Connexion</a>
                 </Button>
-                <Button variant="default" size="sm">
-                  Essayer gratuitement
-                  <Sparkles className="w-4 h-4" />
+                <Button variant="default" size="sm" asChild>
+                  <a href="/cv-generator">
+                    Créer mon CV
+                    <Sparkles className="w-4 h-4" />
+                  </a>
                 </Button>
               </div>
             </div>
