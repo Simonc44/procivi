@@ -43,10 +43,7 @@ export const Navigation = () => {
                 <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
               </a>
             </Button>
-            <Badge variant="outline" className="bg-gradient-ai text-white border-ai-purple/30">
-              <Crown className="w-3 h-3 mr-1" />
-              Pro
-            </Badge>
+            
           </div>
 
           {/* Mobile menu button */}
