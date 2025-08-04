@@ -6,26 +6,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Navigation } from "@/components/Navigation";
 import { ArrowLeft, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const { resetPassword } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simuler l'envoi d'email de récupération
-    setTimeout(() => {
-      toast({
-        title: "Email envoyé !",
-        description: "Si cette adresse existe, vous recevrez un lien de récupération.",
-      });
-      setIsLoading(false);
-      setEmail("");
-    }, 2000);
+    await resetPassword(email);
+    setEmail("");
+    setIsLoading(false);
   };
 
   return (

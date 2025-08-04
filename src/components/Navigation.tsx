@@ -1,9 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Menu, X, Sparkles, Crown } from "lucide-react";
+import { Menu, X, Sparkles, Crown, User, LogOut } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Link } from "react-router-dom";
 export const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
   return <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-border/50">
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-16">
@@ -39,16 +46,32 @@ export const Navigation = () => {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="ghost" size="sm" asChild>
-              <a href="/login">Connexion</a>
-            </Button>
-            <Button variant="default" size="sm" className="group" asChild>
-              <a href="/cv-generator">
-                Créer mon CV
-                <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-              </a>
-            </Button>
-            
+            {user ? (
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/dashboard">
+                    <User className="w-4 w-4 mr-2" />
+                    Dashboard
+                  </Link>
+                </Button>
+                <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                  <LogOut className="w-4 w-4 mr-2" />
+                  Déconnexion
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/login">Connexion</Link>
+                </Button>
+                <Button variant="default" size="sm" className="group" asChild>
+                  <Link to="/cv-generator">
+                    Créer mon CV
+                    <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -76,15 +99,35 @@ export const Navigation = () => {
                 À propos
               </a>
               <div className="flex flex-col gap-3 pt-4 border-t border-border/50">
-                <Button variant="ghost" size="sm" asChild>
-                  <a href="/login">Connexion</a>
-                </Button>
-                <Button variant="default" size="sm" asChild>
-                  <a href="/cv-generator">
-                    Créer mon CV
-                    <Sparkles className="w-4 h-4" />
-                  </a>
-                </Button>
+                {user ? (
+                  <>
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                        <User className="w-4 w-4 mr-2" />
+                        Dashboard
+                      </Link>
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => {
+                      handleSignOut();
+                      setIsMenuOpen(false);
+                    }}>
+                      <LogOut className="w-4 w-4 mr-2" />
+                      Déconnexion
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link to="/login" onClick={() => setIsMenuOpen(false)}>Connexion</Link>
+                    </Button>
+                    <Button variant="default" size="sm" asChild>
+                      <Link to="/cv-generator" onClick={() => setIsMenuOpen(false)}>
+                        Créer mon CV
+                        <Sparkles className="w-4 h-4" />
+                      </Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>}
