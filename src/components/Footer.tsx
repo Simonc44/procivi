@@ -154,15 +154,18 @@ export const Footer = () => {
             </div>
             
             <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
-              {links.legal.map((link, index) => (
-                <a 
-                  key={index}
-                  href={link.href}
-                  className="hover:text-primary transition-colors"
-                >
-                  {link.name}
-                </a>
-              ))}
+              <a href="/privacy" className="hover:text-primary transition-colors">
+                Confidentialité
+              </a>
+              <a href="/terms" className="hover:text-primary transition-colors">
+                Conditions
+              </a>
+              <a href="#" className="hover:text-primary transition-colors">
+                RGPD
+              </a>
+              <a href="#" className="hover:text-primary transition-colors">
+                Cookies
+              </a>
             </div>
           </div>
         </div>

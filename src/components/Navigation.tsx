@@ -23,7 +23,12 @@ export const Navigation = () => {
             <a href="#features" className="text-foreground hover:text-primary transition-colors font-medium">
               Fonctionnalités
             </a>
-            
+            <a href="/cv-generator" className="text-foreground hover:text-primary transition-colors font-medium">
+              Générateur CV
+            </a>
+            <a href="/dashboard" className="text-foreground hover:text-primary transition-colors font-medium">
+              Dashboard
+            </a>
             <a href="#pricing" className="text-foreground hover:text-primary transition-colors font-medium">
               Tarifs
             </a>
@@ -58,8 +63,11 @@ export const Navigation = () => {
               <a href="#features" className="text-foreground hover:text-primary transition-colors font-medium py-2" onClick={() => setIsMenuOpen(false)}>
                 Fonctionnalités
               </a>
-              <a href="#templates" className="text-foreground hover:text-primary transition-colors font-medium py-2" onClick={() => setIsMenuOpen(false)}>
-                Templates
+              <a href="/cv-generator" className="text-foreground hover:text-primary transition-colors font-medium py-2" onClick={() => setIsMenuOpen(false)}>
+                Générateur CV
+              </a>
+              <a href="/dashboard" className="text-foreground hover:text-primary transition-colors font-medium py-2" onClick={() => setIsMenuOpen(false)}>
+                Dashboard
               </a>
               <a href="#pricing" className="text-foreground hover:text-primary transition-colors font-medium py-2" onClick={() => setIsMenuOpen(false)}>
                 Tarifs
