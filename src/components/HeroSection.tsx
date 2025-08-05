@@ -62,14 +62,14 @@ export const HeroSection = () => {
               Propulsé par Gemini 2.0 Flash
             </Badge>
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6 leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
               Crée ton CV parfait
-              <span className="block bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-transparent">
                 en un clic
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl leading-relaxed">
+            <p className="text-xl md:text-2xl text-white/95 mb-8 max-w-2xl leading-relaxed drop-shadow-md">
               L'IA la plus avancée de Google rencontre ton profil LinkedIn pour générer 
               des CV, lettres de motivation et emails personnalisés en 30 secondes.
             </p>
