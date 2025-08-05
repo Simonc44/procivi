@@ -74,7 +74,7 @@ export const PricingSection = () => {
   ];
 
   return (
-    <section id="pricing" className="py-24 bg-gradient-to-b from-background to-muted/20">
+    <section id="pricing" className="py-24 bg-slate-900">
       <div className="container mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">
@@ -99,9 +99,9 @@ export const PricingSection = () => {
           {plans.map((plan, index) => (
             <Card 
               key={index}
-              className={`relative border-border/50 transition-all duration-smooth hover:-translate-y-2 ${
+              className={`relative glass-card transition-all duration-300 hover:-translate-y-2 ${
                 plan.popular 
-                  ? "border-primary/50 shadow-glow scale-105" 
+                  ? "border-blue-400/50 shadow-xl shadow-blue-500/20 scale-105" 
                   : "hover:shadow-lg"
               }`}
             >
@@ -122,14 +122,14 @@ export const PricingSection = () => {
                   </Badge>
                 )}
                 
-                <CardTitle className="text-2xl font-bold mb-2">{plan.name}</CardTitle>
+                <CardTitle className="text-2xl font-bold mb-2 text-white">{plan.name}</CardTitle>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold text-primary">{plan.price}</span>
+                  <span className="text-4xl font-bold text-blue-400">{plan.price}</span>
                   {plan.period !== "Pour les équipes" && (
-                    <span className="text-muted-foreground ml-2">/{plan.period}</span>
+                    <span className="text-white/60 ml-2">/{plan.period}</span>
                   )}
                 </div>
-                <p className="text-muted-foreground">{plan.description}</p>
+                <p className="text-white/80">{plan.description}</p>
               </CardHeader>
 
               <CardContent className="space-y-6">
@@ -138,7 +138,7 @@ export const PricingSection = () => {
                   {plan.features.map((feature, i) => (
                     <div key={i} className="flex items-start gap-3">
                       <CheckCircle className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-foreground">{feature}</span>
+                      <span className="text-sm text-white">{feature}</span>
                     </div>
                   ))}
                   
@@ -146,7 +146,7 @@ export const PricingSection = () => {
                   {plan.limitations.map((limitation, i) => (
                     <div key={i} className="flex items-start gap-3 opacity-60">
                       <X className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-muted-foreground line-through">{limitation}</span>
+                      <span className="text-sm text-white/50 line-through">{limitation}</span>
                     </div>
                   ))}
                 </div>
@@ -164,7 +164,7 @@ export const PricingSection = () => {
                 {/* Free trial note */}
                 {plan.popular && (
                   <div className="text-center">
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-xs text-white/60">
                       Pas de carte bancaire requise • Annulation à tout moment
                     </div>
                   </div>
@@ -176,11 +176,11 @@ export const PricingSection = () => {
 
         {/* Bottom CTA */}
         <div className="text-center mt-16">
-          <div className="bg-gradient-to-r from-primary/5 to-ai-purple/5 rounded-3xl p-8 md:p-12 max-w-4xl mx-auto">
-            <h3 className="text-2xl font-bold text-foreground mb-4">
+          <div className="glass-card rounded-3xl p-8 md:p-12 max-w-4xl mx-auto">
+            <h3 className="text-2xl font-bold text-white mb-4">
               Prêt à transformer ta recherche d'emploi ?
             </h3>
-            <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <p className="text-white/80 mb-8 max-w-2xl mx-auto">
               Rejoins des centaines de professionnels qui ont boosté leur carrière avec Procivi. 
               Commence gratuitement, aucune carte bancaire requise.
             </p>

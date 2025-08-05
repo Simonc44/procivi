@@ -70,7 +70,7 @@ export const FeaturesSection = () => {
   ];
 
   return (
-    <section id="features" className="py-24 bg-gradient-card">
+    <section id="features" className="py-24 bg-slate-900/50">
       <div className="container mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">
@@ -95,7 +95,7 @@ export const FeaturesSection = () => {
           {features.map((feature, index) => (
             <Card 
               key={index} 
-              className="group hover:shadow-lg transition-all duration-smooth hover:-translate-y-1 border-border/50 bg-card/50 backdrop-blur-sm"
+              className="group glass-card hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
             >
               <CardHeader>
                 <div className="flex items-center justify-between mb-4">
@@ -106,12 +106,12 @@ export const FeaturesSection = () => {
                     {feature.badge}
                   </Badge>
                 </div>
-                <CardTitle className="text-xl font-semibold group-hover:text-primary transition-colors">
+                <CardTitle className="text-xl font-semibold text-white group-hover:text-blue-300 transition-colors">
                   {feature.title}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-white/80 leading-relaxed">
                   {feature.description}
                 </p>
               </CardContent>
@@ -120,17 +120,17 @@ export const FeaturesSection = () => {
         </div>
 
         {/* Benefits section */}
-        <div className="bg-gradient-to-r from-primary/5 to-ai-purple/5 rounded-3xl p-8 md:p-12">
+        <div className="glass-card rounded-3xl p-8 md:p-12">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h3 className="text-3xl font-bold text-foreground mb-6">
+              <h3 className="text-3xl font-bold text-white mb-6">
                 Pourquoi choisir Procivi ?
               </h3>
               <div className="grid gap-4">
                 {benefits.map((benefit, index) => (
                   <div key={index} className="flex items-center gap-3">
                     <CheckCircle className="w-5 h-5 text-success flex-shrink-0" />
-                    <span className="text-foreground font-medium">{benefit}</span>
+                    <span className="text-white font-medium">{benefit}</span>
                   </div>
                 ))}
               </div>
@@ -140,19 +140,19 @@ export const FeaturesSection = () => {
               </Button>
             </div>
             <div className="relative">
-              <div className="bg-gradient-to-br from-white to-card p-8 rounded-2xl shadow-lg border border-border/50">
+              <div className="glass-card p-8 rounded-2xl shadow-lg">
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-primary mb-2">500+</div>
-                  <div className="text-muted-foreground mb-4">Professionnels conquis</div>
+                  <div className="text-4xl font-bold text-blue-400 mb-2">500+</div>
+                  <div className="text-white/80 mb-4">Professionnels conquis</div>
                   <div className="flex justify-center mb-4">
                     {"★".repeat(5).split("").map((star, i) => (
                       <span key={i} className="text-yellow-400 text-xl">{star}</span>
                     ))}
                   </div>
-                  <p className="text-sm text-muted-foreground italic">
+                  <p className="text-sm text-white/80 italic">
                     "Procivi a transformé ma recherche d'emploi. CV professionnel en 30 secondes !"
                   </p>
-                  <div className="text-xs text-muted-foreground mt-2">- Sarah M., Data Scientist</div>
+                  <div className="text-xs text-white/60 mt-2">- Sarah M., Data Scientist</div>
                 </div>
               </div>
               <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-gradient-ai rounded-full opacity-20 animate-pulse"></div>
