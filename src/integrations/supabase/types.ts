@@ -14,6 +14,219 @@ export type Database = {
   }
   public: {
     Tables: {
+      cover_letters: {
+        Row: {
+          company_name: string
+          content: string
+          created_at: string
+          generated_content: string | null
+          id: string
+          job_title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_name: string
+          content: string
+          created_at?: string
+          generated_content?: string | null
+          id?: string
+          job_title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string
+          content?: string
+          created_at?: string
+          generated_content?: string | null
+          id?: string
+          job_title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      cvs: {
+        Row: {
+          content: Json
+          created_at: string
+          generated_content: string | null
+          id: string
+          pdf_url: string | null
+          status: string
+          template_type: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: Json
+          created_at?: string
+          generated_content?: string | null
+          id?: string
+          pdf_url?: string | null
+          status?: string
+          template_type?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          generated_content?: string | null
+          id?: string
+          pdf_url?: string | null
+          status?: string
+          template_type?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      generation_logs: {
+        Row: {
+          completion_tokens: number | null
+          cost: number | null
+          created_at: string
+          error_message: string | null
+          id: string
+          model_used: string
+          prompt_tokens: number | null
+          status: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          completion_tokens?: number | null
+          cost?: number | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          model_used?: string
+          prompt_tokens?: number | null
+          status?: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          completion_tokens?: number | null
+          cost?: number | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          model_used?: string
+          prompt_tokens?: number | null
+          status?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      linkedin_imports: {
+        Row: {
+          id: string
+          import_data: Json
+          imported_at: string
+          parsed_data: Json | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          import_data: Json
+          imported_at?: string
+          parsed_data?: Json | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          import_data?: Json
+          imported_at?: string
+          parsed_data?: Json | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          linkedin_url: string | null
+          location: string | null
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          linkedin_url?: string | null
+          location?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          linkedin_url?: string | null
+          location?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      recruitment_emails: {
+        Row: {
+          company_name: string
+          content: string
+          created_at: string
+          generated_content: string | null
+          id: string
+          position: string
+          recipient_name: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_name: string
+          content: string
+          created_at?: string
+          generated_content?: string | null
+          id?: string
+          position: string
+          recipient_name?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string
+          content?: string
+          created_at?: string
+          generated_content?: string | null
+          id?: string
+          position?: string
+          recipient_name?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       stripe_customers: {
         Row: {
           created_at: string | null
@@ -131,6 +344,45 @@ export type Database = {
           status?: Database["public"]["Enums"]["stripe_subscription_status"]
           subscription_id?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          plan_type: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan_type?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan_type?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

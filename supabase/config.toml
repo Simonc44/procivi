@@ -1,1 +1,30 @@
 project_id = "rjkplvxbcjatnvrcsmjq"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[auth]
+enabled = true
+port = 54322
+
+[functions.generate-cv]
+verify_jwt = true
+
+[functions.linkedin-auth]
+verify_jwt = true
+
+[functions.create-checkout]
+verify_jwt = true
+
+[functions.check-subscription]
+verify_jwt = true
+
+[functions.generate-cover-letter]
+verify_jwt = true
+
+[functions.generate-recruitment-email]
+verify_jwt = true

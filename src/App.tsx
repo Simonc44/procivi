@@ -7,7 +7,11 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import About from "./pages/About";
+import Features from "./pages/Features";
+import Pricing from "./pages/Pricing";
 import CVGenerator from "./pages/CVGenerator";
+import CoverLetter from "./pages/CoverLetter";
+import RecruitmentEmail from "./pages/RecruitmentEmail";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -28,7 +32,19 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<About />} />
+          <Route path="/features" element={<Features />} />
+          <Route path="/pricing" element={<Pricing />} />
           <Route path="/cv-generator" element={<CVGenerator />} />
+          <Route path="/cover-letter" element={
+            <ProtectedRoute>
+              <CoverLetter />
+            </ProtectedRoute>
+          } />
+          <Route path="/recruitment-email" element={
+            <ProtectedRoute>
+              <RecruitmentEmail />
+            </ProtectedRoute>
+          } />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
