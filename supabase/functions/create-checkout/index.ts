@@ -11,6 +11,63 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CREATE-CHECKOUT] ${step}${details ? ` - ${JSON.stringify(details)}` : ''}`);
 };
 
+const auditLog = async (supabaseClient: any, userId: string, action: string, ip: string, userAgent: string) => {
+  try {
+    await supabaseClient.from('security_audit_logs').insert({
+      user_id: userId,
+      action: action,
+      resource: 'stripe_checkout',
+      ip_address: ip,
+      user_agent: userAgent
+    });
+  } catch (error) {
+    logStep('Audit log failed', { error: error.message });
+  }
+};
+
+const getStripePrice = async (supabaseClient: any, planType: string): Promise<string> => {
+  try {
+    const { data: config } = await supabaseClient
+      .from('app_config')
+      .select('value')
+      .eq('key', 'stripe_prices')
+      .single();
+      
+    if (!config) {
+      throw new Error('Stripe price configuration not found');
+    }
+    
+    const prices = config.value as Record<string, string>;
+    const priceId = prices[planType];
+    
+    if (!priceId) {
+      throw new Error(`Price ID not found for plan: ${planType}`);
+    }
+    
+    return priceId;
+  } catch (error) {
+    logStep('Failed to get price from config', { error: error.message });
+    // Fallback to default price ID for premium monthly
+    return 'price_1Rp4L5FMe63wZBKKVBgzGNfi';
+  }
+};
+
+const checkSubscriptionEligibility = async (supabaseClient: any, userId: string): Promise<boolean> => {
+  try {
+    const { data: subscription } = await supabaseClient
+      .from('subscriptions')
+      .select('status, plan_type')
+      .eq('user_id', userId)
+      .single();
+      
+    // User can create checkout if they don't have an active subscription
+    return !subscription || subscription.status !== 'active' || subscription.plan_type === 'free';
+  } catch (error) {
+    logStep('Subscription check failed', { error: error.message });
+    return true; // Allow checkout on error
+  }
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -34,7 +91,21 @@ serve(async (req) => {
     const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
 
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    logStep("User authenticated", { userId: user.id });
+
+    // Get IP and User Agent for audit logging
+    const clientIP = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const userAgent = req.headers.get('user-agent') || 'unknown';
+
+    // Validate request payload
+    const requestBody = await req.json();
+    const planType = requestBody.plan_type || 'premium_monthly';
+
+    // Check subscription eligibility
+    const isEligible = await checkSubscriptionEligibility(supabaseClient, user.id);
+    if (!isEligible) {
+      throw new Error("User already has an active subscription");
+    }
 
     const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
     if (!stripeKey) throw new Error('Stripe secret key not configured');
@@ -58,20 +129,28 @@ serve(async (req) => {
       logStep("Created new customer", { customerId });
     }
 
+    // Get price ID from configuration
+    const priceId = await getStripePrice(supabaseClient, planType);
+
     // Create checkout session
+    const origin = req.headers.get("origin") || "https://procivi.lovable.app";
+    const successUrl = requestBody.success_url || `${origin}/dashboard?checkout=success`;
+    const cancelUrl = requestBody.cancel_url || `${origin}/pricing?checkout=cancelled`;
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      line_items: [
-        {
-          price: 'price_1Rp4L5FMe63wZBKKVBgzGNfi', // Use the provided price ID
-          quantity: 1,
-        },
-      ],
-      mode: 'subscription',
-      success_url: `${req.headers.get("origin")}/dashboard?success=true`,
-      cancel_url: `${req.headers.get("origin")}/pricing?canceled=true`,
+      line_items: [{
+        price: priceId,
+        quantity: 1,
+      }],
+      mode: "subscription",
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      allow_promotion_codes: true,
+      billing_address_collection: 'required',
       metadata: {
-        user_id: user.id
+        user_id: user.id,
+        plan_type: planType
       }
     });
 
@@ -80,13 +159,15 @@ serve(async (req) => {
     // Update subscription record
     await supabaseClient
       .from('subscriptions')
-      .update({
+      .upsert({
+        user_id: user.id,
         stripe_customer_id: customerId,
-        status: 'pending'
-      })
-      .eq('user_id', user.id);
+        status: 'pending',
+        plan_type: 'free' // Will be updated after successful payment
+      }, { onConflict: 'user_id' });
 
-    logStep("Updated subscription record");
+    await auditLog(supabaseClient, user.id, 'stripe_checkout_created', clientIP, userAgent);
+    logStep("Database updated");
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -94,8 +175,15 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    logStep("ERROR", { message: error.message });
-    return new Response(JSON.stringify({ error: error.message }), {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logStep("ERROR", { message: errorMessage });
+    
+    // Don't leak sensitive information
+    const publicErrorMessage = errorMessage.includes('Stripe secret') 
+      ? 'Payment service temporarily unavailable'
+      : errorMessage;
+
+    return new Response(JSON.stringify({ error: publicErrorMessage }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
     });

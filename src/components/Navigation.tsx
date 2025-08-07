@@ -27,21 +27,21 @@ export const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-foreground hover:text-primary transition-colors font-medium">
+            <Link to="/#features" className="text-foreground hover:text-primary transition-colors font-medium">
               Fonctionnalités
-            </a>
-            <a href="/cv-generator" className="text-foreground hover:text-primary transition-colors font-medium">
+            </Link>
+            <Link to="/cv-generator" className="text-foreground hover:text-primary transition-colors font-medium">
               Générateur CV
-            </a>
-            <a href="/dashboard" className="text-foreground hover:text-primary transition-colors font-medium">
+            </Link>
+            <Link to="/dashboard" className="text-foreground hover:text-primary transition-colors font-medium">
               Dashboard
-            </a>
-            <a href="#pricing" className="text-foreground hover:text-primary transition-colors font-medium">
+            </Link>
+            <Link to="/#pricing" className="text-foreground hover:text-primary transition-colors font-medium">
               Tarifs
-            </a>
-            <a href="/about" className="text-foreground hover:text-primary transition-colors font-medium">
+            </Link>
+            <Link to="/about" className="text-foreground hover:text-primary transition-colors font-medium">
               À propos
-            </a>
+            </Link>
           </div>
 
           {/* Desktop CTA */}
@@ -83,21 +83,21 @@ export const Navigation = () => {
         {/* Mobile Navigation */}
         {isMenuOpen && <div className="md:hidden py-4 border-t border-border/50">
             <div className="flex flex-col gap-4">
-              <a href="#features" className="text-foreground hover:text-primary transition-colors font-medium py-2" onClick={() => setIsMenuOpen(false)}>
+              <Link to="/#features" className="text-foreground hover:text-primary transition-colors font-medium py-2" onClick={() => setIsMenuOpen(false)}>
                 Fonctionnalités
-              </a>
-              <a href="/cv-generator" className="text-foreground hover:text-primary transition-colors font-medium py-2" onClick={() => setIsMenuOpen(false)}>
+              </Link>
+              <Link to="/cv-generator" className="text-foreground hover:text-primary transition-colors font-medium py-2" onClick={() => setIsMenuOpen(false)}>
                 Générateur CV
-              </a>
-              <a href="/dashboard" className="text-foreground hover:text-primary transition-colors font-medium py-2" onClick={() => setIsMenuOpen(false)}>
+              </Link>
+              <Link to="/dashboard" className="text-foreground hover:text-primary transition-colors font-medium py-2" onClick={() => setIsMenuOpen(false)}>
                 Dashboard
-              </a>
-              <a href="#pricing" className="text-foreground hover:text-primary transition-colors font-medium py-2" onClick={() => setIsMenuOpen(false)}>
+              </Link>
+              <Link to="/#pricing" className="text-foreground hover:text-primary transition-colors font-medium py-2" onClick={() => setIsMenuOpen(false)}>
                 Tarifs
-              </a>
-              <a href="/about" className="text-foreground hover:text-primary transition-colors font-medium py-2" onClick={() => setIsMenuOpen(false)}>
+              </Link>
+              <Link to="/about" className="text-foreground hover:text-primary transition-colors font-medium py-2" onClick={() => setIsMenuOpen(false)}>
                 À propos
-              </a>
+              </Link>
               <div className="flex flex-col gap-3 pt-4 border-t border-border/50">
                 {user ? (
                   <>

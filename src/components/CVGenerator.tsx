@@ -1,21 +1,15 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { CVGeneratorForm } from "./CVGeneratorForm";
 import { 
   User, 
-  Briefcase, 
-  GraduationCap, 
-  Award, 
   Linkedin, 
   Brain, 
   Download, 
   FileText, 
   Mail,
-  Sparkles,
-  Zap,
   CheckCircle
 } from "lucide-react";
 
@@ -75,120 +69,11 @@ export const CVGenerator = () => {
             </div>
 
             {/* Tab Content */}
-            <Card className="border-border/50">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  {activeTab === "manual" && <User className="w-5 h-5" />}
-                  {activeTab === "linkedin" && <Linkedin className="w-5 h-5" />}
-                  {activeTab === "ai" && <Brain className="w-5 h-5" />}
-                  {activeTab === "manual" && "Informations personnelles"}
-                  {activeTab === "linkedin" && "Connexion LinkedIn"}
-                  {activeTab === "ai" && "Génération assistée par IA"}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {activeTab === "manual" && (
-                  <div className="space-y-4">
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <Input placeholder="Prénom" />
-                      <Input placeholder="Nom" />
-                    </div>
-                    <Input placeholder="Email professionnel" />
-                    <Input placeholder="Téléphone" />
-                    <Input placeholder="Poste recherché" />
-                    <Textarea placeholder="Résumé professionnel..." rows={4} />
-                    
-                    <div className="space-y-3">
-                      <h4 className="font-medium flex items-center gap-2">
-                        <Briefcase className="w-4 h-4" />
-                        Expérience professionnelle
-                      </h4>
-                      <div className="p-4 border border-dashed border-border rounded-lg text-center text-muted-foreground">
-                        Clique pour ajouter une expérience
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      <h4 className="font-medium flex items-center gap-2">
-                        <GraduationCap className="w-4 h-4" />
-                        Formation
-                      </h4>
-                      <div className="p-4 border border-dashed border-border rounded-lg text-center text-muted-foreground">
-                        Clique pour ajouter une formation
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === "linkedin" && (
-                  <div className="text-center space-y-6">
-                    <div className="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center mx-auto">
-                      <Linkedin className="w-8 h-8 text-secondary" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2">Connecte ton profil LinkedIn</h3>
-                      <p className="text-muted-foreground mb-6">
-                        Importe automatiquement tes expériences, formations et compétences
-                      </p>
-                    </div>
-                    <Button variant="linkedin" size="lg" className="w-full">
-                      <Linkedin className="w-5 h-5 mr-2" />
-                      Se connecter avec LinkedIn
-                    </Button>
-                    <div className="text-xs text-muted-foreground">
-                      ✓ Connexion sécurisée OAuth 2.0 • ✓ Aucun stockage de mot de passe
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === "ai" && (
-                  <div className="space-y-6">
-                    <div className="text-center">
-                      <div className="w-16 h-16 bg-gradient-ai rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Brain className="w-8 h-8 text-white" />
-                      </div>
-                      <h3 className="text-lg font-semibold mb-2">Génération assistée par IA</h3>
-                      <p className="text-muted-foreground">
-                        Décris ton parcours et laisse Gemini créer ton CV professionnel
-                      </p>
-                    </div>
-                    
-                    <Textarea 
-                      placeholder="Exemple: Je suis développeur full-stack avec 5 ans d'expérience en React et Node.js. J'ai travaillé chez Startup XYZ en tant que lead developer..."
-                      rows={6}
-                      className="resize-none"
-                    />
-                    
-                    <Input placeholder="Poste ciblé (ex: Senior Developer, Product Manager...)" />
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <Input placeholder="Années d'expérience" type="number" />
-                      <Input placeholder="Secteur d'activité" />
-                    </div>
-                  </div>
-                )}
-
-                <Button 
-                  onClick={handleGenerate}
-                  disabled={isGenerating}
-                  variant="ai" 
-                  size="lg" 
-                  className="w-full"
-                >
-                  {isGenerating ? (
-                    <>
-                      <Sparkles className="w-5 h-5 mr-2 animate-spin" />
-                      Génération en cours...
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="w-5 h-5 mr-2" />
-                      Générer mon CV avec l'IA
-                    </>
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
+            <CVGeneratorForm 
+              activeTab={activeTab}
+              isGenerating={isGenerating}
+              onGenerate={handleGenerate}
+            />
           </div>
 
           {/* Right - Preview & Actions */}
