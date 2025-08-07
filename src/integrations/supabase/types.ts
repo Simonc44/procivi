@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_config: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       cover_letters: {
         Row: {
           company_name: string
@@ -224,6 +251,36 @@ export type Database = {
           recipient_name?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      security_audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          resource: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          resource: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          resource?: string
+          user_agent?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
