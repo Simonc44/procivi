@@ -37,15 +37,26 @@ const Login = () => {
     setIsLoading(false);
   };
 
-  // Fonction pour la connexion avec Google via Supabase OAuth
+  // 🔐 Connexion Google OAuth
   const handleGoogleSignIn = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: window.location.origin + "/dashboard", // redirection après login
+        redirectTo: window.location.origin + "/dashboard",
       },
     });
-    if (error) alert("Erreur lors de la connexion Google : " + error.message);
+    if (error) alert("Erreur Google : " + error.message);
+  };
+
+  // 🐱 Connexion GitHub OAuth
+  const handleGithubSignIn = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "github",
+      options: {
+        redirectTo: window.location.origin + "/dashboard",
+      },
+    });
+    if (error) alert("Erreur GitHub : " + error.message);
   };
 
   return (
@@ -77,12 +88,9 @@ const Login = () => {
               <CardContent className="space-y-6">
                 {/* Social Login */}
                 <div className="space-y-3">
-                  <Button variant="outline" className="w-full" disabled>
+                  <Button variant="outline" className="w-full" onClick={handleGithubSignIn}>
                     <Github className="w-4 h-4 mr-2" />
                     Continuer avec GitHub
-                    <Badge variant="secondary" className="ml-auto text-xs">
-                      Bientôt
-                    </Badge>
                   </Button>
                   <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
                     <Chrome className="w-4 h-4 mr-2" />
