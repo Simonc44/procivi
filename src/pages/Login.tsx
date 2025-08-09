@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, Mail, Lock, Github, Chrome } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/lib/supabaseClient"; // Assure-toi d'avoir ce fichier configuré
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const [email, setEmail] = useState("");
