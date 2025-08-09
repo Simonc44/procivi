@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, Mail, Lock, Github, Chrome } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabaseClient"; // Assure-toi d'avoir ce fichier configuré
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -19,27 +20,38 @@ const Login = () => {
 
   useEffect(() => {
     if (user) {
-      navigate('/dashboard');
+      navigate("/dashboard");
     }
   }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     const { error } = await signIn(email, password);
-    
+
     if (!error) {
-      navigate('/dashboard');
+      navigate("/dashboard");
     }
-    
+
     setIsLoading(false);
+  };
+
+  // Fonction pour la connexion avec Google via Supabase OAuth
+  const handleGoogleSignIn = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin + "/dashboard", // redirection après login
+      },
+    });
+    if (error) alert("Erreur lors de la connexion Google : " + error.message);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-ai-purple/5">
       <Navigation />
-      
+
       <div className="pt-24 pb-16">
         <div className="container mx-auto px-6">
           <div className="max-w-md mx-auto">
@@ -61,19 +73,20 @@ const Login = () => {
                   Entrez vos identifiants pour accéder à votre compte
                 </CardDescription>
               </CardHeader>
-              
+
               <CardContent className="space-y-6">
                 {/* Social Login */}
                 <div className="space-y-3">
                   <Button variant="outline" className="w-full" disabled>
                     <Github className="w-4 h-4 mr-2" />
                     Continuer avec GitHub
-                    <Badge variant="secondary" className="ml-auto text-xs">Bientôt</Badge>
+                    <Badge variant="secondary" className="ml-auto text-xs">
+                      Bientôt
+                    </Badge>
                   </Button>
-                  <Button variant="outline" className="w-full" disabled>
+                  <Button variant="outline" className="w-full" onClick={handleGoogleSignIn}>
                     <Chrome className="w-4 h-4 mr-2" />
                     Continuer avec Google
-                    <Badge variant="secondary" className="ml-auto text-xs">Bientôt</Badge>
                   </Button>
                 </div>
 
@@ -82,9 +95,7 @@ const Login = () => {
                     <Separator />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">
-                      Ou continuer avec
-                    </span>
+                    <span className="bg-background px-2 text-muted-foreground">Ou continuer avec</span>
                   </div>
                 </div>
 
@@ -105,14 +116,11 @@ const Login = () => {
                       />
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <Label htmlFor="password">Mot de passe</Label>
-                      <Link 
-                        to="/forgot-password" 
-                        className="text-sm text-primary hover:underline"
-                      >
+                      <Link to="/forgot-password" className="text-sm text-primary hover:underline">
                         Mot de passe oublié ?
                       </Link>
                     </div>
@@ -130,12 +138,7 @@ const Login = () => {
                     </div>
                   </div>
 
-                  <Button 
-                    type="submit" 
-                    className="w-full" 
-                    disabled={isLoading}
-                    variant="hero"
-                  >
+                  <Button type="submit" className="w-full" disabled={isLoading} variant="hero">
                     {isLoading ? "Connexion..." : "Se connecter"}
                     <Sparkles className="w-4 h-4 ml-2" />
                   </Button>
