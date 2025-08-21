@@ -7,15 +7,6 @@ import { User, Linkedin, Brain, Download, FileText, Mail, CheckCircle } from "lu
 
 export const CVGenerator = () => {
   const [activeTab, setActiveTab] = useState("manual");
-  const [isGenerating, setIsGenerating] = useState(false);
-
-  const handleGenerate = () => {
-    setIsGenerating(true);
-    // Simulation génération IA
-    setTimeout(() => {
-      setIsGenerating(false);
-    }, 3000);
-  };
 
   const tabs = [
     { id: "manual", label: "Saisie manuelle", icon: User },
@@ -58,7 +49,7 @@ export const CVGenerator = () => {
             </div>
 
             {/* Tab Content */}
-            <CVGeneratorForm activeTab={activeTab} isGenerating={isGenerating} onGenerate={handleGenerate} />
+            <CVGeneratorForm activeTab={activeTab} />
           </div>
 
           {/* Right - Preview & Actions */}
