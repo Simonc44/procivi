@@ -27,7 +27,7 @@ export const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <Link to="/#features" className="text-foreground hover:text-primary transition-colors font-medium">
+            <Link to="/features" className="text-foreground hover:text-primary transition-colors font-medium">
               Fonctionnalités
             </Link>
             <Link to="/cv-generator" className="text-foreground hover:text-primary transition-colors font-medium">
@@ -36,7 +36,7 @@ export const Navigation = () => {
             <Link to="/dashboard" className="text-foreground hover:text-primary transition-colors font-medium">
               Dashboard
             </Link>
-            <Link to="/#pricing" className="text-foreground hover:text-primary transition-colors font-medium">
+            <Link to="/pricing" className="text-foreground hover:text-primary transition-colors font-medium">
               Tarifs
             </Link>
             <Link to="/about" className="text-foreground hover:text-primary transition-colors font-medium">
