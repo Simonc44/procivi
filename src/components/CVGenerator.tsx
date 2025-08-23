@@ -3,10 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CVGeneratorForm } from "./CVGeneratorForm";
+import CVPreview from "./CVPreview"; // <-- Import du composant preview
 import { User, Linkedin, Brain, Download, FileText, Mail, CheckCircle } from "lucide-react";
 
 export const CVGenerator = () => {
   const [activeTab, setActiveTab] = useState("manual");
+  const [cvData, setCvData] = useState(null); // <-- État pour stocker les données CV
 
   const tabs = [
     { id: "manual", label: "Saisie manuelle", icon: User },
@@ -49,7 +51,7 @@ export const CVGenerator = () => {
             </div>
 
             {/* Tab Content */}
-            <CVGeneratorForm activeTab={activeTab} />
+            <CVGeneratorForm activeTab={activeTab} onChange={setCvData} />
           </div>
 
           {/* Right - Preview & Actions */}
@@ -64,14 +66,14 @@ export const CVGenerator = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-  {cvData ? (
-    <CVPreview cvData={cvData} />
-  ) : (
-    <div className="bg-muted/30 rounded-lg p-8 text-center">
-      <p className="text-muted-foreground text-sm">Ton CV apparaîtra ici en temps réel</p>
-    </div>
-             )}
-            </CardContent>
+                {cvData ? (
+                  <CVPreview cvData={cvData} />
+                ) : (
+                  <div className="bg-muted/30 rounded-lg p-8 text-center">
+                    <p className="text-muted-foreground text-sm">Ton CV apparaîtra ici en temps réel</p>
+                  </div>
+                )}
+              </CardContent>
             </Card>
 
             {/* Export Options */}
