@@ -64,20 +64,14 @@ export const CVGenerator = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="bg-muted/30 rounded-lg p-8 text-center">
-                  <div className="w-16 h-20 bg-white border border-border mx-auto mb-4 rounded shadow-sm">
-                    <div className="h-2 bg-muted rounded-full mx-2 mt-2"></div>
-                    <div className="h-1 bg-muted rounded-full mx-2 mt-1"></div>
-                    <div className="h-1 bg-muted rounded-full mx-2 mt-1 w-3/4"></div>
-                    <div className="space-y-1 mt-2 mx-2">
-                      <div className="h-1 bg-muted/50 rounded-full"></div>
-                      <div className="h-1 bg-muted/50 rounded-full w-5/6"></div>
-                      <div className="h-1 bg-muted/50 rounded-full w-4/6"></div>
-                    </div>
-                  </div>
-                  <p className="text-muted-foreground text-sm">Ton CV apparaîtra ici en temps réel</p>
-                </div>
-              </CardContent>
+  {cvData ? (
+    <CVPreview cvData={cvData} />
+  ) : (
+    <div className="bg-muted/30 rounded-lg p-8 text-center">
+      <p className="text-muted-foreground text-sm">Ton CV apparaîtra ici en temps réel</p>
+    </div>
+             )}
+            </CardContent>
             </Card>
 
             {/* Export Options */}
