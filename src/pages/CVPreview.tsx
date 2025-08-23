@@ -6,58 +6,54 @@ import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { CVPreview } from "./CVPreview";
 
-interface CVData {
-  personalInfo: any;
-  skills: any[];
-  education: any[];
-  experiences: any[];
-}
-
-export const CVPreviewPage = () => {
-  const { id } = useParams<{ id: string }>();
-  const [cvData, setCvData] = useState<CVData | null>(null);
+const CVPreview = () => {
+  const { id } = useParams();
+  const [cvData, setCvData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!id) return;
 
-    const fetchCV = async () => {
+    async function fetchCV() {
       setLoading(true);
-      setError(null);
       try {
-        // Exemple d'appel supabase, à adapter à ta structure
         const { data, error } = await supabase
           .from("cvs")
-          .select("personalInfo, skills, education, experiences")
+          .select("*")
           .eq("id", id)
           .single();
 
-        if (error) throw error;
-        if (!data) throw new Error("CV non trouvé");
-
-        setCvData(data);
-      } catch (err: any) {
-        setError(err.message || "Erreur lors du chargement du CV");
+        if (error) {
+          setError(error.message);
+          setCvData(null);
+        } else {
+          setCvData(data);
+          setError(null);
+        }
+      } catch (err) {
+        setError("Erreur inattendue");
+        setCvData(null);
       } finally {
         setLoading(false);
       }
-    };
+    }
 
     fetchCV();
   }, [id]);
 
+  if (loading) return <p>Chargement...</p>;
+  if (error) return <p>Erreur : {error}</p>;
+  if (!cvData) return <p>Aucune donnée trouvée pour cet ID.</p>;
+
+  // Attention : n'affiche pas un objet directement, mais ses propriétés !
   return (
     <>
       <Navigation />
       <main className="container mx-auto p-6">
-        <Button asChild variant="outline" className="mb-6">
-          <Link to="/dashboard">
-            <ArrowLeft className="inline-block w-4 h-4 mr-2" />
-            Retour au tableau de bord
-          </Link>
+        <Button as={Link} to="/dashboard" variant="outline" className="mb-6">
+          <ArrowLeft className="mr-2" /> Retour au dashboard
         </Button>
 
         <Card>
@@ -65,10 +61,39 @@ export const CVPreviewPage = () => {
             <CardTitle>Prévisualisation du CV</CardTitle>
           </CardHeader>
           <CardContent>
-            {loading && <p>Chargement...</p>}
-            {error && <p className="text-red-600">Erreur : {error}</p>}
-            {cvData && <CVPreview cvData={cvData} />}
-            {!loading && !error && !cvData && <p>Aucun CV trouvé.</p>}
+            <h2 className="text-xl font-bold mb-4">{cvData.personalInfo?.fullName}</h2>
+            <p>Email : {cvData.personalInfo?.email}</p>
+
+            <section className="mt-6">
+              <h3 className="font-semibold">Compétences</h3>
+              <ul>
+                {cvData.skills?.map((skill, idx) => (
+                  <li key={idx}>{skill}</li>
+                ))}
+              </ul>
+            </section>
+
+            <section className="mt-6">
+              <h3 className="font-semibold">Éducation</h3>
+              <ul>
+                {cvData.education?.map((edu, idx) => (
+                  <li key={idx}>
+                    {edu.degree} - {edu.institution} ({edu.year})
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <section className="mt-6">
+              <h3 className="font-semibold">Expériences</h3>
+              <ul>
+                {cvData.experiences?.map((exp, idx) => (
+                  <li key={idx}>
+                    {exp.title} chez {exp.company} ({exp.startDate} - {exp.endDate || "Présent"})
+                  </li>
+                ))}
+              </ul>
+            </section>
           </CardContent>
         </Card>
       </main>
@@ -76,3 +101,5 @@ export const CVPreviewPage = () => {
     </>
   );
 };
+
+export default CVPreview;
