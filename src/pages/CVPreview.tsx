@@ -1,81 +1,78 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Navigation } from "@/components/Navigation";
+import { Footer } from "@/components/Footer";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { CVPreview } from "./CVPreview";
 
-interface CVPreviewProps {
-  cvData: {
-    personalInfo: {
-      name: string;
-      email?: string;
-      phone?: string;
-      address?: string;
-      [key: string]: any;
-    };
-    skills: { id: string; name: string }[];
-    education: { id: string; institution: string; degree: string; startDate?: string; endDate?: string }[];
-    experiences: { id: string; company: string; role: string; startDate?: string; endDate?: string; description?: string }[];
-  };
+interface CVData {
+  personalInfo: any;
+  skills: any[];
+  education: any[];
+  experiences: any[];
 }
 
-export const CVPreview: React.FC<CVPreviewProps> = ({ cvData }) => {
-  const { personalInfo, skills, education, experiences } = cvData;
+export const CVPreviewPage = () => {
+  const { id } = useParams<{ id: string }>();
+  const [cvData, setCvData] = useState<CVData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchCV = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Exemple d'appel supabase, à adapter à ta structure
+        const { data, error } = await supabase
+          .from("cvs")
+          .select("personalInfo, skills, education, experiences")
+          .eq("id", id)
+          .single();
+
+        if (error) throw error;
+        if (!data) throw new Error("CV non trouvé");
+
+        setCvData(data);
+      } catch (err: any) {
+        setError(err.message || "Erreur lors du chargement du CV");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCV();
+  }, [id]);
 
   return (
-    <div className="p-6 bg-white rounded shadow max-w-lg mx-auto">
-      {/* Personal Info */}
-      <section className="mb-6">
-        <h1 className="text-2xl font-bold">{personalInfo.name}</h1>
-        {personalInfo.email && <p>Email: {personalInfo.email}</p>}
-        {personalInfo.phone && <p>Téléphone: {personalInfo.phone}</p>}
-        {personalInfo.address && <p>Adresse: {personalInfo.address}</p>}
-      </section>
+    <>
+      <Navigation />
+      <main className="container mx-auto p-6">
+        <Button asChild variant="outline" className="mb-6">
+          <Link to="/dashboard">
+            <ArrowLeft className="inline-block w-4 h-4 mr-2" />
+            Retour au tableau de bord
+          </Link>
+        </Button>
 
-      {/* Skills */}
-      <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Compétences</h2>
-        {skills.length > 0 ? (
-          <ul className="list-disc list-inside">
-            {skills.map((skill) => (
-              <li key={skill.id}>{skill.name}</li>
-            ))}
-          </ul>
-        ) : (
-          <p>Aucune compétence renseignée.</p>
-        )}
-      </section>
-
-      {/* Education */}
-      <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Éducation</h2>
-        {education.length > 0 ? (
-          <ul className="list-disc list-inside">
-            {education.map((edu) => (
-              <li key={edu.id}>
-                <strong>{edu.degree}</strong> - {edu.institution}{" "}
-                {edu.startDate && `(${edu.startDate} - ${edu.endDate || "Présent"})`}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>Aucune formation renseignée.</p>
-        )}
-      </section>
-
-      {/* Experiences */}
-      <section>
-        <h2 className="text-xl font-semibold mb-2">Expériences</h2>
-        {experiences.length > 0 ? (
-          <ul className="list-disc list-inside">
-            {experiences.map((exp) => (
-              <li key={exp.id}>
-                <strong>{exp.role}</strong> chez {exp.company}{" "}
-                {exp.startDate && `(${exp.startDate} - ${exp.endDate || "Présent"})`}
-                {exp.description && <p className="text-sm mt-1">{exp.description}</p>}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>Aucune expérience renseignée.</p>
-        )}
-      </section>
-    </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Prévisualisation du CV</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading && <p>Chargement...</p>}
+            {error && <p className="text-red-600">Erreur : {error}</p>}
+            {cvData && <CVPreview cvData={cvData} />}
+            {!loading && !error && !cvData && <p>Aucun CV trouvé.</p>}
+          </CardContent>
+        </Card>
+      </main>
+      <Footer />
+    </>
   );
 };
