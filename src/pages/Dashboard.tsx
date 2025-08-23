@@ -1,23 +1,89 @@
+import { useEffect, useState } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, Download, Eye, Plus, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/lib/supabaseClient";
+
+interface CV {
+  id: string;
+  name: string;
+  created_at: string;
+  downloads: number;
+}
+
+interface Stat {
+  title: string;
+  value: string | number;
+  icon: React.ElementType;
+}
 
 const Dashboard = () => {
-  const recentCVs = [
-    { id: 1, name: "CV Développeur Full Stack", createdAt: "2024-01-15", downloads: 5 },
-    { id: 2, name: "CV Designer UX/UI", createdAt: "2024-01-10", downloads: 3 },
-    { id: 3, name: "CV Chef de Projet", createdAt: "2024-01-08", downloads: 8 },
-  ];
+  const [recentCVs, setRecentCVs] = useState<CV[]>([]);
+  const [stats, setStats] = useState<Stat[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const stats = [
-    { title: "CV créés", value: "12", icon: FileText },
-    { title: "Téléchargements", value: "45", icon: Download },
-    { title: "Vues profil", value: "128", icon: Eye },
-    { title: "Taux de réussite", value: "85%", icon: TrendingUp },
-  ];
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+
+      // 1. Récupère les 5 derniers CVs
+      const { data: cvs, error: cvError } = await supabase
+        .from<CV>("cvs")
+        .select("id, name, created_at, downloads")
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      if (cvError) console.error("Erreur fetch CVs:", cvError);
+
+      // 2. Compte le nombre total de CVs
+      const { count: totalCvs, error: cntError } = await supabase
+        .from("cvs")
+        .select("*", { count: "exact", head: true });
+
+      if (cntError) console.error("Erreur comptage CVs:", cntError);
+
+      // 3. Somme des téléchargements
+      const { data: dlData, error: dlError } = await supabase
+        .from("cvs")
+        .select("downloads");
+
+      if (dlError) console.error("Erreur sum téléchargements:", dlError);
+
+      const totalDownloads = dlData?.reduce(
+        (sum, cv) => sum + (cv.downloads || 0),
+        0
+      );
+
+      // 4. Placeholders à personnaliser
+      const profileViews = "—"; // à remplacer par offre/leads?
+      const successRate = "—"; // à définir selon ton contexte
+
+      setRecentCVs(cvs || []);
+      setStats([
+        { title: "CV créés", value: totalCvs ?? 0, icon: FileText },
+        { title: "Téléchargements", value: totalDownloads ?? 0, icon: Download },
+        { title: "Vues profil", value: profileViews, icon: Eye },
+        { title: "Taux de réussite", value: successRate, icon: TrendingUp },
+      ]);
+
+      setLoading(false);
+    }
+
+    loadData();
+  }, []);
+
+  if (loading) {
+    return <div className="min-h-screen p-8 text-center">Chargement…</div>;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -36,7 +102,9 @@ const Dashboard = () => {
             {stats.map((stat, index) => (
               <Card key={index}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    {stat.title}
+                  </CardTitle>
                   <stat.icon className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -66,11 +134,15 @@ const Dashboard = () => {
               <CardContent>
                 <div className="space-y-4">
                   {recentCVs.map((cv) => (
-                    <div key={cv.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div
+                      key={cv.id}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
                       <div>
                         <h3 className="font-medium">{cv.name}</h3>
                         <p className="text-sm text-muted-foreground">
-                          Créé le {new Date(cv.createdAt).toLocaleDateString()}
+                          Créé le{" "}
+                          {new Date(cv.created_at).toLocaleDateString()}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
