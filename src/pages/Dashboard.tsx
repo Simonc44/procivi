@@ -30,12 +30,24 @@ const Dashboard = () => {
   const [recentCVs, setRecentCVs] = useState<CV[]>([]);
   const [stats, setStats] = useState<Stat[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
 
-  // Remplace cette valeur par l'ID utilisateur connecté (récupéré via ton auth)
-  const user = supabase.auth.getUser?.(); // selon ta méthode d'authentification
+  // Récupère l'utilisateur connecté (async)
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (error) {
+        console.error("Erreur récupération utilisateur:", error.message);
+        return;
+      }
+      setUserId(data.user?.id || null);
+    };
+
+    fetchUser();
+  }, []);
 
   useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
 
     async function loadData() {
       setLoading(true);
@@ -45,6 +57,7 @@ const Dashboard = () => {
         const { data: cvs, error: cvError } = await supabase
           .from<CV>("cvs")
           .select("id, name, created_at, downloads")
+          .eq("user_id", userId)
           .order("created_at", { ascending: false })
           .limit(5);
 
@@ -55,7 +68,8 @@ const Dashboard = () => {
         // 2. Compte le nombre total de CVs
         const { count: totalCvs, error: cntError } = await supabase
           .from("cvs")
-          .select("*", { count: "exact", head: true });
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", userId);
 
         if (cntError) {
           console.error("Erreur comptage CVs:", cntError);
@@ -64,23 +78,22 @@ const Dashboard = () => {
         // 3. Somme des téléchargements
         const { data: dlData, error: dlError } = await supabase
           .from("cvs")
-          .select("downloads");
+          .select("downloads")
+          .eq("user_id", userId);
 
         if (dlError) {
           console.error("Erreur sum téléchargements:", dlError);
         }
 
-        const totalDownloads = dlData?.reduce(
-          (sum, cv) => sum + (cv.downloads || 0),
-          0
-        ) ?? 0;
+        const totalDownloads =
+          dlData?.reduce((sum, cv) => sum + (cv.downloads || 0), 0) ?? 0;
 
         // 4. Vues profil
         const { count: profileViewsCount, error: profileViewsError } =
           await supabase
             .from("profile_views")
             .select("*", { count: "exact", head: true })
-            .eq("user_id", user.data.user?.id);
+            .eq("user_id", userId);
 
         if (profileViewsError) {
           console.error("Erreur récupération vues profil:", profileViewsError);
@@ -91,13 +104,13 @@ const Dashboard = () => {
           await supabase
             .from("applications")
             .select("*", { count: "exact", head: true })
-            .eq("user_id", user.data.user?.id);
+            .eq("user_id", userId);
 
         const { count: acceptedApplications, error: acceptedAppsError } =
           await supabase
             .from("applications")
             .select("*", { count: "exact", head: true })
-            .eq("user_id", user.data.user?.id)
+            .eq("user_id", userId)
             .eq("status", "accepted");
 
         if (totalAppsError || acceptedAppsError) {
@@ -109,7 +122,8 @@ const Dashboard = () => {
 
         const successRate =
           totalApplications && totalApplications > 0
-            ? ((acceptedApplications ?? 0) / totalApplications * 100).toFixed(1) + "%"
+            ? ((acceptedApplications ?? 0) / totalApplications * 100).toFixed(1) +
+              "%"
             : "—";
 
         setRecentCVs(cvs ?? []);
@@ -127,14 +141,13 @@ const Dashboard = () => {
     }
 
     loadData();
-  }, [user]);
+  }, [userId]);
 
-  // Fonction pour analyser le profil (appelle une fonction serverless ou API)
   async function analyzeProfile() {
-    if (!user) return;
+    if (!userId) return;
 
     const { data, error } = await supabase.functions.invoke("analyze-profile", {
-      body: { user_id: user.data.user?.id },
+      body: { user_id: userId },
     });
 
     if (error) {
@@ -144,8 +157,7 @@ const Dashboard = () => {
     }
   }
 
-  // URL de ta fonction LinkedIn Auth
-  const linkedInAuthUrl = "/functions/linkedin-auth"; // adapte selon ta config
+  const linkedInAuthUrl = "/functions/linkedin-auth";
 
   if (loading) {
     return <div className="min-h-screen p-8 text-center">Chargement…</div>;
@@ -196,37 +208,39 @@ const Dashboard = () => {
                 </div>
               </CardHeader>
               <CardContent>
-  <div className="space-y-4">
-    {recentCVs.length === 0 ? (
-      <p className="text-center text-muted-foreground">Il n’y a rien pour le moment.</p>
-    ) : (
-      recentCVs.map((cv) => (
-        <div
-          key={cv.id}
-          className="flex items-center justify-between p-4 border rounded-lg"
-        >
-          <div>
-            <h3 className="font-medium">{cv.name}</h3>
-            <p className="text-sm text-muted-foreground">
-              Créé le {new Date(cv.created_at).toLocaleDateString()}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
-              {cv.downloads} téléchargements
-            </span>
-            <Button variant="outline" size="sm">
-              <Eye className="h-4 w-4" />
-            </Button>
-            <Button variant="outline" size="sm">
-              <Download className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      ))
-    )}
-  </div>
-</CardContent>
+                <div className="space-y-4">
+                  {recentCVs.length === 0 ? (
+                    <p className="text-center text-muted-foreground">
+                      Il n’y a rien pour le moment.
+                    </p>
+                  ) : (
+                    recentCVs.map((cv) => (
+                      <div
+                        key={cv.id}
+                        className="flex items-center justify-between p-4 border rounded-lg"
+                      >
+                        <div>
+                          <h3 className="font-medium">{cv.name}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Créé le {new Date(cv.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">
+                            {cv.downloads} téléchargements
+                          </span>
+                          <Button variant="outline" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <Download className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
             </Card>
 
             {/* Actions rapides */}
