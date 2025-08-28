@@ -29,7 +29,11 @@ const Pricing = () => {
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('create-checkout');
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+         body: {
+            plan_type: 'premium_monthly', // ou ce que tu veux
+         },
+           });
 
       if (error) throw error;
 
