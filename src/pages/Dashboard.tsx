@@ -31,55 +31,121 @@ const Dashboard = () => {
   const [stats, setStats] = useState<Stat[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Remplace cette valeur par l'ID utilisateur connecté (récupéré via ton auth)
+  const user = supabase.auth.getUser?.(); // selon ta méthode d'authentification
+
   useEffect(() => {
+    if (!user) return;
+
     async function loadData() {
       setLoading(true);
 
-      // 1. Récupère les 5 derniers CVs
-      const { data: cvs, error: cvError } = await supabase
-        .from<CV>("cvs")
-        .select("id, name, created_at, downloads")
-        .order("created_at", { ascending: false })
-        .limit(5);
+      try {
+        // 1. Récupère les 5 derniers CVs
+        const { data: cvs, error: cvError } = await supabase
+          .from<CV>("cvs")
+          .select("id, name, created_at, downloads")
+          .order("created_at", { ascending: false })
+          .limit(5);
 
-      if (cvError) console.error("Erreur fetch CVs:", cvError);
+        if (cvError) {
+          console.error("Erreur fetch CVs:", cvError);
+        }
 
-      // 2. Compte le nombre total de CVs
-      const { count: totalCvs, error: cntError } = await supabase
-        .from("cvs")
-        .select("*", { count: "exact", head: true });
+        // 2. Compte le nombre total de CVs
+        const { count: totalCvs, error: cntError } = await supabase
+          .from("cvs")
+          .select("*", { count: "exact", head: true });
 
-      if (cntError) console.error("Erreur comptage CVs:", cntError);
+        if (cntError) {
+          console.error("Erreur comptage CVs:", cntError);
+        }
 
-      // 3. Somme des téléchargements
-      const { data: dlData, error: dlError } = await supabase
-        .from("cvs")
-        .select("downloads");
+        // 3. Somme des téléchargements
+        const { data: dlData, error: dlError } = await supabase
+          .from("cvs")
+          .select("downloads");
 
-      if (dlError) console.error("Erreur sum téléchargements:", dlError);
+        if (dlError) {
+          console.error("Erreur sum téléchargements:", dlError);
+        }
 
-      const totalDownloads = dlData?.reduce(
-        (sum, cv) => sum + (cv.downloads || 0),
-        0
-      );
+        const totalDownloads = dlData?.reduce(
+          (sum, cv) => sum + (cv.downloads || 0),
+          0
+        ) ?? 0;
 
-      // 4. Placeholders à personnaliser
-      const profileViews = "—"; // à remplacer par offre/leads?
-      const successRate = "—"; // à définir selon ton contexte
+        // 4. Vues profil
+        const { count: profileViewsCount, error: profileViewsError } =
+          await supabase
+            .from("profile_views")
+            .select("*", { count: "exact", head: true })
+            .eq("user_id", user.data.user?.id);
 
-      setRecentCVs(cvs || []);
-      setStats([
-        { title: "CV créés", value: totalCvs ?? 0, icon: FileText },
-        { title: "Téléchargements", value: totalDownloads ?? 0, icon: Download },
-        { title: "Vues profil", value: profileViews, icon: Eye },
-        { title: "Taux de réussite", value: successRate, icon: TrendingUp },
-      ]);
+        if (profileViewsError) {
+          console.error("Erreur récupération vues profil:", profileViewsError);
+        }
 
-      setLoading(false);
+        // 5. Calcul du taux de réussite
+        const { count: totalApplications, error: totalAppsError } =
+          await supabase
+            .from("applications")
+            .select("*", { count: "exact", head: true })
+            .eq("user_id", user.data.user?.id);
+
+        const { count: acceptedApplications, error: acceptedAppsError } =
+          await supabase
+            .from("applications")
+            .select("*", { count: "exact", head: true })
+            .eq("user_id", user.data.user?.id)
+            .eq("status", "accepted");
+
+        if (totalAppsError || acceptedAppsError) {
+          console.error(
+            "Erreur récupération applications:",
+            totalAppsError || acceptedAppsError
+          );
+        }
+
+        const successRate =
+          totalApplications && totalApplications > 0
+            ? ((acceptedApplications ?? 0) / totalApplications * 100).toFixed(1) + "%"
+            : "—";
+
+        setRecentCVs(cvs ?? []);
+        setStats([
+          { title: "CV créés", value: totalCvs ?? 0, icon: FileText },
+          { title: "Téléchargements", value: totalDownloads, icon: Download },
+          { title: "Vues profil", value: profileViewsCount ?? 0, icon: Eye },
+          { title: "Taux de réussite", value: successRate, icon: TrendingUp },
+        ]);
+      } catch (error) {
+        console.error("Erreur chargement dashboard:", error);
+      } finally {
+        setLoading(false);
+      }
     }
 
     loadData();
-  }, []);
+  }, [user]);
+
+  // Fonction pour analyser le profil (appelle une fonction serverless ou API)
+  async function analyzeProfile() {
+    if (!user) return;
+
+    const { data, error } = await supabase.functions.invoke("analyze-profile", {
+      body: { user_id: user.data.user?.id },
+    });
+
+    if (error) {
+      alert("Erreur analyse profil: " + error.message);
+    } else {
+      alert("Analyse terminée: " + JSON.stringify(data));
+    }
+  }
+
+  // URL de ta fonction LinkedIn Auth
+  const linkedInAuthUrl = "/functions/linkedin-auth"; // adapte selon ta config
 
   if (loading) {
     return <div className="min-h-screen p-8 text-center">Chargement…</div>;
@@ -102,9 +168,7 @@ const Dashboard = () => {
             {stats.map((stat, index) => (
               <Card key={index}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {stat.title}
-                  </CardTitle>
+                  <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
                   <stat.icon className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -141,8 +205,7 @@ const Dashboard = () => {
                       <div>
                         <h3 className="font-medium">{cv.name}</h3>
                         <p className="text-sm text-muted-foreground">
-                          Créé le{" "}
-                          {new Date(cv.created_at).toLocaleDateString()}
+                          Créé le {new Date(cv.created_at).toLocaleDateString()}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -150,9 +213,11 @@ const Dashboard = () => {
                           {cv.downloads} téléchargements
                         </span>
                         <Button variant="outline" size="sm">
+                          {/* ici tu peux ajouter un modal preview */}
                           <Eye className="h-4 w-4" />
                         </Button>
                         <Button variant="outline" size="sm">
+                          {/* logique téléchargement à ajouter */}
                           <Download className="h-4 w-4" />
                         </Button>
                       </div>
@@ -176,11 +241,21 @@ const Dashboard = () => {
                       Créer un nouveau CV
                     </Link>
                   </Button>
-                  <Button variant="outline" className="w-full justify-start">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => {
+                      window.location.href = linkedInAuthUrl;
+                    }}
+                  >
                     <FileText className="h-4 w-4 mr-2" />
                     Importer depuis LinkedIn
                   </Button>
-                  <Button variant="outline" className="w-full justify-start">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={analyzeProfile}
+                  >
                     <TrendingUp className="h-4 w-4 mr-2" />
                     Analyser mon profil
                   </Button>
