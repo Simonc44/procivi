@@ -196,35 +196,37 @@ const Dashboard = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {recentCVs.map((cv) => (
-                    <div
-                      key={cv.id}
-                      className="flex items-center justify-between p-4 border rounded-lg"
-                    >
-                      <div>
-                        <h3 className="font-medium">{cv.name}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Créé le {new Date(cv.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">
-                          {cv.downloads} téléchargements
-                        </span>
-                        <Button variant="outline" size="sm">
-                          {/* ici tu peux ajouter un modal preview */}
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          {/* logique téléchargement à ajouter */}
-                          <Download className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
+  <div className="space-y-4">
+    {recentCVs.length === 0 ? (
+      <p className="text-center text-muted-foreground">Il n’y a rien pour le moment.</p>
+    ) : (
+      recentCVs.map((cv) => (
+        <div
+          key={cv.id}
+          className="flex items-center justify-between p-4 border rounded-lg"
+        >
+          <div>
+            <h3 className="font-medium">{cv.name}</h3>
+            <p className="text-sm text-muted-foreground">
+              Créé le {new Date(cv.created_at).toLocaleDateString()}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              {cv.downloads} téléchargements
+            </span>
+            <Button variant="outline" size="sm">
+              <Eye className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      ))
+    )}
+  </div>
+</CardContent>
             </Card>
 
             {/* Actions rapides */}
