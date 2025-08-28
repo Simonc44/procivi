@@ -30,134 +30,56 @@ const Dashboard = () => {
   const [recentCVs, setRecentCVs] = useState<CV[]>([]);
   const [stats, setStats] = useState<Stat[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState<string | null>(null);
-
-  // Récupère l'utilisateur connecté (async)
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (error) {
-        console.error("Erreur récupération utilisateur:", error.message);
-        return;
-      }
-      setUserId(data.user?.id || null);
-    };
-
-    fetchUser();
-  }, []);
 
   useEffect(() => {
-    if (!userId) return;
-
     async function loadData() {
       setLoading(true);
 
-      try {
-        // 1. Récupère les 5 derniers CVs
-        const { data: cvs, error: cvError } = await supabase
-          .from<CV>("cvs")
-          .select("id, name, created_at, downloads")
-          .eq("user_id", userId)
-          .order("created_at", { ascending: false })
-          .limit(5);
+      // 1. Récupère les 5 derniers CVs
+      const { data: cvs, error: cvError } = await supabase
+        .from<CV>("cvs")
+        .select("id, name, created_at, downloads")
+        .order("created_at", { ascending: false })
+        .limit(5);
 
-        if (cvError) {
-          console.error("Erreur fetch CVs:", cvError);
-        }
+      if (cvError) console.error("Erreur fetch CVs:", cvError);
 
-        // 2. Compte le nombre total de CVs
-        const { count: totalCvs, error: cntError } = await supabase
-          .from("cvs")
-          .select("*", { count: "exact", head: true })
-          .eq("user_id", userId);
+      // 2. Compte le nombre total de CVs
+      const { count: totalCvs, error: cntError } = await supabase
+        .from("cvs")
+        .select("*", { count: "exact", head: true });
 
-        if (cntError) {
-          console.error("Erreur comptage CVs:", cntError);
-        }
+      if (cntError) console.error("Erreur comptage CVs:", cntError);
 
-        // 3. Somme des téléchargements
-        const { data: dlData, error: dlError } = await supabase
-          .from("cvs")
-          .select("downloads")
-          .eq("user_id", userId);
+      // 3. Somme des téléchargements
+      const { data: dlData, error: dlError } = await supabase
+        .from("cvs")
+        .select("downloads");
 
-        if (dlError) {
-          console.error("Erreur sum téléchargements:", dlError);
-        }
+      if (dlError) console.error("Erreur sum téléchargements:", dlError);
 
-        const totalDownloads =
-          dlData?.reduce((sum, cv) => sum + (cv.downloads || 0), 0) ?? 0;
+      const totalDownloads = dlData?.reduce(
+        (sum, cv) => sum + (cv.downloads || 0),
+        0
+      );
 
-        // 4. Vues profil
-        const { count: profileViewsCount, error: profileViewsError } =
-          await supabase
-            .from("profile_views")
-            .select("*", { count: "exact", head: true })
-            .eq("user_id", userId);
+      // 4. Placeholders à personnaliser
+      const profileViews = "—"; // à remplacer par offre/leads?
+      const successRate = "—"; // à définir selon ton contexte
 
-        if (profileViewsError) {
-          console.error("Erreur récupération vues profil:", profileViewsError);
-        }
+      setRecentCVs(cvs || []);
+      setStats([
+        { title: "CV créés", value: totalCvs ?? 0, icon: FileText },
+        { title: "Téléchargements", value: totalDownloads ?? 0, icon: Download },
+        { title: "Vues profil", value: profileViews, icon: Eye },
+        { title: "Taux de réussite", value: successRate, icon: TrendingUp },
+      ]);
 
-        // 5. Calcul du taux de réussite
-        const { count: totalApplications, error: totalAppsError } =
-          await supabase
-            .from("applications")
-            .select("*", { count: "exact", head: true })
-            .eq("user_id", userId);
-
-        const { count: acceptedApplications, error: acceptedAppsError } =
-          await supabase
-            .from("applications")
-            .select("*", { count: "exact", head: true })
-            .eq("user_id", userId)
-            .eq("status", "accepted");
-
-        if (totalAppsError || acceptedAppsError) {
-          console.error(
-            "Erreur récupération applications:",
-            totalAppsError || acceptedAppsError
-          );
-        }
-
-        const successRate =
-          totalApplications && totalApplications > 0
-            ? ((acceptedApplications ?? 0) / totalApplications * 100).toFixed(1) +
-              "%"
-            : "—";
-
-        setRecentCVs(cvs ?? []);
-        setStats([
-          { title: "CV créés", value: totalCvs ?? 0, icon: FileText },
-          { title: "Téléchargements", value: totalDownloads, icon: Download },
-          { title: "Vues profil", value: profileViewsCount ?? 0, icon: Eye },
-          { title: "Taux de réussite", value: successRate, icon: TrendingUp },
-        ]);
-      } catch (error) {
-        console.error("Erreur chargement dashboard:", error);
-      } finally {
-        setLoading(false);
-      }
+      setLoading(false);
     }
 
     loadData();
-  }, [userId]);
-
-  async function analyzeProfile() {
-    if (!userId) return;
-
-    const { data, error } = await supabase.functions.invoke("analyze-profile", {
-      body: { user_id: userId },
-    });
-
-    if (error) {
-      alert("Erreur analyse profil: " + error.message);
-    } else {
-      alert("Analyse terminée: " + JSON.stringify(data));
-    }
-  }
-
-  const linkedInAuthUrl = "/functions/linkedin-auth";
+  }, []);
 
   if (loading) {
     return <div className="min-h-screen p-8 text-center">Chargement…</div>;
@@ -180,7 +102,9 @@ const Dashboard = () => {
             {stats.map((stat, index) => (
               <Card key={index}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    {stat.title}
+                  </CardTitle>
                   <stat.icon className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -209,36 +133,31 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {recentCVs.length === 0 ? (
-                    <p className="text-center text-muted-foreground">
-                      Il n’y a rien pour le moment.
-                    </p>
-                  ) : (
-                    recentCVs.map((cv) => (
-                      <div
-                        key={cv.id}
-                        className="flex items-center justify-between p-4 border rounded-lg"
-                      >
-                        <div>
-                          <h3 className="font-medium">{cv.name}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            Créé le {new Date(cv.created_at).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-muted-foreground">
-                            {cv.downloads} téléchargements
-                          </span>
-                          <Button variant="outline" size="sm">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        </div>
+                  {recentCVs.map((cv) => (
+                    <div
+                      key={cv.id}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
+                      <div>
+                        <h3 className="font-medium">{cv.name}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Créé le{" "}
+                          {new Date(cv.created_at).toLocaleDateString()}
+                        </p>
                       </div>
-                    ))
-                  )}
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">
+                          {cv.downloads} téléchargements
+                        </span>
+                        <Button variant="outline" size="sm">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <Download className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -257,21 +176,11 @@ const Dashboard = () => {
                       Créer un nouveau CV
                     </Link>
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start"
-                    onClick={() => {
-                      window.location.href = linkedInAuthUrl;
-                    }}
-                  >
+                  <Button variant="outline" className="w-full justify-start">
                     <FileText className="h-4 w-4 mr-2" />
                     Importer depuis LinkedIn
                   </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start"
-                    onClick={analyzeProfile}
-                  >
+                  <Button variant="outline" className="w-full justify-start">
                     <TrendingUp className="h-4 w-4 mr-2" />
                     Analyser mon profil
                   </Button>
